@@ -1,4 +1,4 @@
-# python_env_ubuntu_18_04
+# python_env_ubuntu_18.04
 basic python dev environment based on ubuntu 18.04
 
 # docker build
