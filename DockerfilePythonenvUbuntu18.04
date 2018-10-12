@@ -1,0 +1,43 @@
+FROM ubuntu:bionic-20180821
+
+# change sh from, possibly, dash to bash
+RUN cd /bin && rm sh && ln -s bash sh
+
+# apt
+RUN apt-get update -y
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+	apt-utils
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+	vim bash-completion sudo
+
+# Packages needed to get the upload stuff for DMP working.
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+	python-pip python-dev python3-dev unixodbc-dev
+
+RUN pip install --upgrade pip
+
+# add extra packages for running the automation scripts
+RUN pip install pyserial
+RUN pip install pyotp
+RUN rm /usr/lib/python2.7/dist-packages/chardet* -rf
+RUN pip install msrest
+RUN pip install pyodbc
+
+# add extra packages for providing the production configuration validation.
+RUN pip install json-spec 
+
+# user setup
+RUN useradd docker -d /home/docker -m -s /bin/bash &&\
+ 	passwd -d docker &&\
+	echo "docker  ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers; echo "Defaults    !requiretty" >> /etc/sudoers
+
+USER docker
+
+ENV EXPORT_DIR /export
+VOLUME ["$EXPORT_DIR"]
+WORKDIR $EXPORT_DIR
+
+#ENTRYPOINT ["tail", "-f", "/dev/null"]
+
